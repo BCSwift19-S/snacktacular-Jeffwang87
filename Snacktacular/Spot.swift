@@ -92,11 +92,37 @@ class Spot: NSObject, MKAnnotation {
                 in   if let error = error {
                     completed(false)
                 } else {
+                    self.documentID = ref!.documentID
                     completed(true)
                 }
             }
             
         }
         
+    }
+    
+    func updateAverageRating(completed: @escaping() ->()){
+        let db = Firestore.firestore()
+        let reviewRef = db.collection("spots").document(self.documentID).collection("reviews")
+        reviewRef.getDocuments{ (QuerySnapshot, error) in
+            guard error == nil else {
+                print("ERROR")
+                return completed()
+            }
+           var ratingTotal = 0.0
+            for document in QuerySnapshot!.documents {
+                let reviewDictionary = document.data()
+                let rating = reviewDictionary["rating"] as! Int? ?? 0
+                ratingTotal = ratingTotal + Double(rating)
+            }
+            self.averageRating = ratingTotal / Double(QuerySnapshot!.count)
+            self.numberofReviews = QuerySnapshot!.count
+            let dataToSave = self.dictionary
+            let spotRef = db.collection("spots").document(self.documentID)
+            spotRef.setData(dataToSave){ error in
+                completed()
+            }
+            print("^^^^ Document updated")
+        }
     }
 }

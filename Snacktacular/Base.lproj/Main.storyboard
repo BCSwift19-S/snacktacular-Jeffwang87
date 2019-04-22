@@ -30,7 +30,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Restaurant Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cqC-12-jiu">
-                                                    <rect key="frame" x="8" y="4" width="359" height="33"/>
+                                                    <rect key="frame" x="8" y="4" width="398" height="33"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="33" id="b5a-9R-g2N"/>
                                                     </constraints>
@@ -49,7 +49,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Avg. Rating: 6.0" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="A0J-Ud-eFA">
-                                                    <rect key="frame" x="239" y="33" width="128" height="21"/>
+                                                    <rect key="frame" x="278" y="33" width="128" height="21"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="21" id="CKT-tw-Wrk"/>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="128" id="m2D-dY-oxq"/>
@@ -93,7 +93,7 @@
                     </view>
                     <toolbarItems>
                         <barButtonItem style="plain" id="LqT-KX-ubF">
-                            <segmentedControl key="customView" opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="GwX-fg-sdd">
+                            <segmentedControl key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="GwX-fg-sdd">
                                 <rect key="frame" x="20" y="12" width="374" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <segments>
@@ -608,12 +608,12 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" leftItemsSupplementBackButton="YES" id="lwF-8B-saF">
-                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="yIH-dn-Ofe">
+                        <barButtonItem key="leftBarButtonItem" title="Cancel" id="yIH-dn-Ofe">
                             <connections>
                                 <action selector="Cancelbuttonpressed:" destination="IHh-7e-0UB" id="H0p-Yf-lSF"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" systemItem="save" id="7dB-iC-hRI">
+                        <barButtonItem key="rightBarButtonItem" title="Save" id="7dB-iC-hRI">
                             <connections>
                                 <action selector="savebuttonpressed:" destination="IHh-7e-0UB" id="Syf-WB-ccb"/>
                             </connections>

@@ -11,7 +11,7 @@ import UIKit
 class SpotPhotosCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var photoImageView: UIImageView!
     
-    var photo: photo! {
+    var photo: Photo! {
         didSet{
             photoImageView.image = photo.image
         }

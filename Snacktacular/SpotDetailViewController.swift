@@ -28,7 +28,7 @@ class SpotDetailViewController: UIViewController {
     
     var spot: Spot!
     var reviews: Reviews!
-    var photo: Photos!
+    var photos: Photos!
     let regionDistance: CLLocationDistance = 750
     var locationManager: CLLocationManager!
     var currentLocation: CLLocation!
@@ -48,6 +48,7 @@ class SpotDetailViewController: UIViewController {
         imagePicker.delegate = self
     
         
+        
         //mapView.delegate = self
         
         if spot == nil{
@@ -65,7 +66,7 @@ class SpotDetailViewController: UIViewController {
             navigationController?.setToolbarHidden(true, animated: true)
         }
         reviews = Reviews()
-        photo = Photos()
+        photos = Photos()
         let region = MKCoordinateRegion(center: spot.coordinate, latitudinalMeters: regionDistance, longitudinalMeters: regionDistance)
         mapView.setRegion(region, animated: true)
         
@@ -77,8 +78,28 @@ class SpotDetailViewController: UIViewController {
         
         reviews.loadData(spot: spot){
             self.tableView.reloadData()
+            if self.reviews.reviewArray.count > 0 {
+                var total = 0
+                for review in self.reviews.reviewArray{
+                    total = total + review.rating
+                }
+                let average = Double(total) / Double(self.reviews.reviewArray.count)
+                self.averageRatingLabel.text = "\(average.roundTo(places: 1))"
+
+            } else {
+                self.averageRatingLabel.text = "-.-"
+            }
+//            if self.spot.numberofReviews > 0 {
+//                let average = self.spot.averageRating
+//                self.averageRatingLabel.text = "\(average.roundTo(places: 1))"
+//            } else{
+//                self.averageRatingLabel.text = "-.-"
+//            }
+            self.photos.loadData(spot: self.spot){
+            self.collectionView.reloadData()
         }
     }
+}
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         spot.name = nameField.text!
@@ -116,6 +137,15 @@ class SpotDetailViewController: UIViewController {
         updateMap()
     }
     
+    func disableTextEditing(){
+        nameField.backgroundColor = UIColor.clear
+        nameField.isEnabled = false
+        nameField.noBorder()
+        addressField.backgroundColor = UIColor.clear
+        addressField.isEnabled = false
+        addressField.noBorder()
+    }
+    
     func updateMap(){
         mapView.removeAnnotations(mapView.annotations)
             mapView.addAnnotation(spot)
@@ -133,12 +163,11 @@ class SpotDetailViewController: UIViewController {
     
     func cameraOrlibraryAlert(){
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        let cameraAction = UIAlertAction(title: "Camera", style: .default) { _ in
+        let cameraAction = UIAlertAction(title: "Camera", style: .default){ _ in
             self.accessCamera()
         }
-            
-        let photoLibraryAction = UIAlertAction(title: "Photo Library", style: .cancel) { _ in
-                self.accessLibrary()
+        let photoLibraryAction = UIAlertAction(title: "Photo Library", style: .default) { _ in
+            self.accessLibrary()
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil )
         alertController.addAction(cameraAction)
@@ -147,12 +176,41 @@ class SpotDetailViewController: UIViewController {
         present(alertController, animated: true, completion: nil)
     }
     
+    func saveCancelAlert(title: String, message: String, segueIndentifier: String){
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let saveAction = UIAlertAction(title: "save", style: .default) { (_) in
+            self.spot.saveData {success in
+            self.Savebarbuttom.title = "Done"
+            self.CancelBarButton.title = ""
+            self.navigationController?.setToolbarHidden(true, animated: true)
+            self.disableTextEditing()
+                if segueIndentifier == "AddReview" {
+                    self.performSegue(withIdentifier: segueIndentifier, sender: nil)
+                } else {
+                    self.cameraOrlibraryAlert()
+                }
+            }
+        }
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        alertController.addAction(saveAction)
+        alertController.addAction(cancelAction)
+        present(alertController, animated: true, completion: nil)
+}
+    
     @IBAction func photoButtonPressed(_ sender: UIButton) {
-        cameraOrlibraryAlert()
-    }
+        if spot.documentID == ""{
+            saveCancelAlert(title: "This Venue Has Not Benn Saved", message: "You must save this venue", segueIndentifier: "Addphoto")
+        } else{
+            cameraOrlibraryAlert()
+        }
+        }
     
     @IBAction func reviewButtonPressed(_ sender: UIButton) {
+        if spot.documentID == ""{
+            saveCancelAlert(title: "This Venue Has Not Benn Saved", message: "You must save this venue", segueIndentifier: "AddReview")
+        } else{
         performSegue(withIdentifier: "AddReview", sender: nil)
+        }
     }
     
     @IBAction func lookupPlacePressed(_ sender: UIBarButtonItem) {
@@ -281,12 +339,12 @@ extension SpotDetailViewController: UITableViewDelegate, UITableViewDataSource {
 }
 extension SpotDetailViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return photo.photoArray.count
+        return photos.photoArray.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as! SpotPhotosCollectionViewCell
-        cell.photo = photo.photoArray[indexPath.row]
+        cell.photo = photos.photoArray[indexPath.row]
         return cell
     }
     
@@ -294,21 +352,22 @@ extension SpotDetailViewController: UICollectionViewDelegate, UICollectionViewDa
 }
 
 extension SpotDetailViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate{
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        let photo = photo()
-        
-        photo.image = info[UIImagePickerController.InfoKey.originalImage] as! UIimage
-        photo.photoArray.append(photo)
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        let photo = Photo()
+
+        photo.image = info[UIImagePickerController.InfoKey.originalImage] as! UIImage
+        photos.photoArray.append(photo)
         dismiss(animated: true) {
-            self.collectionView.reloadData()
+            photo.saveData(spot: self.spot) {(success) in
+                
             }
         }
-        
     }
+
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        dismiss(animated: true, completion: nil)
+       dismiss(animated: true, completion: nil)
     }
-    
+
     func accessLibrary() {
         imagePicker.sourceType = .photoLibrary
         present(imagePicker, animated:  true, completion: nil)
@@ -319,6 +378,6 @@ extension SpotDetailViewController: UINavigationControllerDelegate, UIImagePicke
             present(imagePicker, animated: true, completion: nil)
         }
     }
-    
+
 }
 

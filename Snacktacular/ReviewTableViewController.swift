@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Firebase
 
 class ReviewTableViewController: UITableViewController {
     @IBOutlet weak var nameLabel: UILabel!
@@ -49,7 +50,53 @@ class ReviewTableViewController: UITableViewController {
         if review == nil {
             review = Review()
         }
+        updateuserinterface()
 }
+    func updateuserinterface() {
+        nameLabel.text = spot.name
+        addressLabel.text = spot.address
+        rating = review.rating
+        reviewTitleField.text = review.title
+        enableDisableSaveButton()
+        reviewTextView.text = review.text
+        if review.documentID == ""{
+            addBoardersToEditableObjects()
+        } else {
+            if review.reviewUserID == Auth.auth().currentUser?.email {
+                self.navigationItem.leftItemsSupplementBackButton = false
+                saveBarButton.title = "update"
+                addBoardersToEditableObjects()
+                deleteButton.isHidden = false
+            } else{
+                cancelBarButton.title = ""
+                saveBarButton.title = ""
+                postedByLabel.text = "\(review.reviewUserID)"
+                for starButton in satrButtonCollection{
+                    starButton.backgroundColor = UIColor.white
+                    starButton.adjustsImageWhenDisabled = false
+                    starButton.isEnabled = false
+                    reviewTitleField.isEnabled = false
+                    reviewTextView.isEditable = false
+                    reviewTitleField.backgroundColor = UIColor.white
+                    reviewTitleField.backgroundColor = UIColor.white
+                }
+                
+            }
+        }
+    }
+    func addBoardersToEditableObjects() {
+        reviewTitleField.addBorder(width: 0.5, radius: 5.0, color: .black)
+        reviewTextView.addBorder(width: 0.5, radius: 5.0, color: .black)
+        buttonsBackgroundView.addBorder(width: 0.5, radius: 5.0, color: .black)
+    }
+    
+    func enableDisableSaveButton(){
+        if reviewTitleField.text != "" {
+            saveBarButton.isEnabled = true
+        } else {
+            saveBarButton.isEnabled = false
+        }
+    }
     func leaveViewController() {
         let isPresentingInAddMode = presentingViewController is UINavigationController
         if isPresentingInAddMode {
@@ -70,9 +117,18 @@ class ReviewTableViewController: UITableViewController {
     }
     
     @IBAction func ReviewTitleChanged(_ sender: UITextField) {
+        enableDisableSaveButton()
     }
     
     @IBAction func deleteButtonPressed(_ sender: UIButton) {
+        review.deleteData(spot: spot){(success) in
+            if success {
+                self.leaveViewController()
+            } else {
+                print("ERROR")
+            }
+            
+        }
     }
     
     @IBAction func savebuttonpressed(_ sender: UIBarButtonItem) {

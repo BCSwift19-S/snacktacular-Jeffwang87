@@ -98,9 +98,9 @@
 			isa = PBXGroup;
 			children = (
 				3E8390DF206597F600512DEA /* AppDelegate.swift */,
+				B8E38D16224FCD5C0063F56F /* Spots.swift */,
 				B8E38D14224FC76E0063F56F /* Spot.swift */,
 				B822BEB4226506CC00F62285 /* Review.swift */,
-				B8E38D16224FCD5C0063F56F /* Spots.swift */,
 				B822BEB6226514C700F62285 /* Reviews.swift */,
 				B822BEBA22651E9A00F62285 /* photos.swift */,
 				3E8390E1206597F600512DEA /* SpotsListViewController.swift */,
